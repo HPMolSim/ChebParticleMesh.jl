@@ -1,0 +1,3 @@
+[deps]
+ChebParticleMesh = "1983ef0c-217d-4026-99b0-9163e7750d85"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"

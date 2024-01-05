@@ -2,5 +2,7 @@ using ChebParticleMesh
 using Test
 
 @testset "ChebParticleMesh.jl" begin
-    # Write your tests here.
+    include("utils.jl")
+    include("chebpoly.jl")
+    include("index.jl")
 end

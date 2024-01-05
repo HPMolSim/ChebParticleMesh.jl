@@ -3,6 +3,12 @@ uuid = "1983ef0c-217d-4026-99b0-9163e7750d85"
 authors = ["xzgao <xz.gao@connect.ust.hk> and contributors"]
 version = "1.0.0-DEV"
 
+[deps]
+ExTinyMD = "fec76197-d59f-46dd-a0ed-76a83c21f7aa"
+FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+
 [compat]
 julia = "1"
 

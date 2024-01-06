@@ -17,8 +17,8 @@
                         for i in 1:sx
                             for j in 1:sy
                                 for k in 1:sz
-                                    @test image2pad(ImageIndex(ix + i, iy + j, iz + k), gridinfo) == PadIndex(px + i, py + j, pz + k)
-                                    @test ImageIndex(ix + i, iy + j, iz + k) ∈ pad2image(PadIndex(px + i, py + j, pz + k), gridinfo)
+                                    @test id_image2pad(ImageIndex(ix + i, iy + j, iz + k), gridinfo) == PadIndex(px + i, py + j, pz + k)
+                                    @test ImageIndex(ix + i, iy + j, iz + k) ∈ id_pad2image(PadIndex(px + i, py + j, pz + k), gridinfo)
                                 end
                             end
                         end

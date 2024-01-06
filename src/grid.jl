@@ -71,3 +71,67 @@ function TransInfo(N_real::NTuple{3, Int}, periodicity::NTuple{3, Bool}, image::
 
     return trans_info
 end
+
+"""
+function grid_revise_image!(gridbox::GridBox{T}) where{T}
+
+    set all values of gridbox.image_grid to 0
+"""
+function grid_revise_image!(gridbox::GridBox{T}) where{T}
+
+    for i in eachindex(gridbox.image_grid)
+        gridbox.image_grid[i] = zero(T)
+    end
+
+    return nothing
+end
+
+"""
+function grid_revise_pad!(gridbox::GridBox{T}) where{T}
+
+    set all values of gridbox.pad_grid to 0
+"""
+function grid_revise_pad!(gridbox::GridBox{T}) where{T}
+
+    for i in eachindex(gridbox.pad_grid)
+        gridbox.pad_grid[i] = zero(T)
+    end
+
+    return nothing
+end
+
+@inbounds function grid_image2pad!(gridbox::GridBox{T}, gridinfo::GridInfo{T}) where T
+
+    grid_revise_pad!(gridbox)
+    trans_info = gridinfo.trans_info
+    for (iid, pid, sid) in trans_info
+        (ix, iy, iz), (px, py, pz), (sx, sy, sz) = iid, pid, sid
+        @turbo for i in 1:sx
+            for j in 1:sy
+                for k in 1:sz
+                    gridbox.pad_grid[px + i, py + j, pz + k] += gridbox.image_grid[ix + i, iy + j, iz + k]
+                end
+            end
+        end
+    end
+
+    return gridbox
+end
+
+@inbounds function grid_pad2image!(gridbox::GridBox{T}, gridinfo::GridInfo{T}) where T
+
+    grid_revise_image!(gridbox)
+    trans_info = gridinfo.trans_info
+    for (iid, pid, sid) in trans_info
+        (ix, iy, iz), (px, py, pz), (sx, sy, sz) = iid, pid, sid
+        @turbo for i in 1:sx
+            for j in 1:sy
+                for k in 1:sz
+                    gridbox.image_grid[ix + i, iy + j, iz + k] = gridbox.pad_grid[px + i, py + j, pz + k]
+                end
+            end
+        end
+    end
+
+    return gridbox
+end

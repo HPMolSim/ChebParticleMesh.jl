@@ -21,15 +21,33 @@ function pad_grid_id(x::Point{3, T}, gridinfo::GridInfo{T}) where{T}
     return PadIndex(idx, idy, idz)
 end
 
+function pad_grid_pos(id::PadIndex, gridinfo::GridInfo{T}) where{T}
+
+    x = (id.idx - gridinfo.pad[1] - T(0.5)) * gridinfo.h[1]
+    y = (id.idy - gridinfo.pad[2] - T(0.5)) * gridinfo.h[2]
+    z = (id.idz - gridinfo.pad[3] - T(0.5)) * gridinfo.h[3]
+
+    return Point(x, y, z)
+end
+
 function image_grid_id(x::Point{3, T}, gridinfo::GridInfo{T}) where{T}
     
     idx, idy, idz = nearest_grid_id(x, gridinfo.h)
 
-    idx = idx + gridinfo.w[1] + 1
-    idy = idy + gridinfo.w[2] + 1
-    idz = idz + gridinfo.w[3] + 1
+    idx = idx + gridinfo.image[1]
+    idy = idy + gridinfo.image[2]
+    idz = idz + gridinfo.image[3]
 
     return ImageIndex(idx, idy, idz)
+end
+
+function image_grid_pos(id::ImageIndex, gridinfo::GridInfo{T}) where{T}
+
+    x = (id.idx - gridinfo.image[1] - T(0.5)) * gridinfo.h[1]
+    y = (id.idy - gridinfo.image[2] - T(0.5)) * gridinfo.h[2]
+    z = (id.idz - gridinfo.image[3] - T(0.5)) * gridinfo.h[3]
+
+    return Point(x, y, z)
 end
 
 function id_image2pad_single(id_image_i::Int, N_i::T, image_i::Int, pad_i::Int, periodicity::Bool) where{T}

@@ -10,7 +10,7 @@ function ChebCoef(f::Function, h::T, w::Int, ν::Int) where{T<:Union{Float32, Fl
 """
 function ChebCoef(f::Function, h::T, w::Int, ν::Int) where{T<:Union{Float32, Float64}}
     coef = pwcheb_coef(f, h, w, ν)
-    return ChebCoef{T}(h, w, ν, coef)
+    return ChebCoef{T}(f, h, w, ν, coef)
 end
 
 function pwcheb_coef(f::Function, h::T, window_cut::Int, ν::Int) where{T<:Union{Float32, Float64}}
@@ -50,7 +50,7 @@ function pwcheb_eval!(x0::T, cheb_approx::Array{T, 1}, chebcoef::ChebCoef{T}) wh
 
     h = chebcoef.h
     C = chebcoef.coef
-    @assert abs(x0) ≤ h / 2
+    @assert (abs(x0) ≤ h / 2) | (abs(x0) ≈ h / 2)
     @assert size(cheb_approx, 1) == size(C, 1) - 1
 
     if x0 ≥ zero(T)
@@ -72,6 +72,30 @@ function pwcheb_eval(x0::T, chebcoef::ChebCoef{T}) where{T<:Union{Float32, Float
 
     cheb_approx = zeros(T, size(chebcoef.coef, 1) - 1)
     cheb_approx = pwcheb_eval!(x0, cheb_approx, chebcoef)
+    
+    return cheb_approx
+end
+
+function f_eval!(x0::T, cheb_approx::Array{T, 1}, chebcoef::ChebCoef{T}) where{T<:Union{Float32, Float64}}
+
+    h = chebcoef.h
+    C = chebcoef.coef
+    w = chebcoef.w
+    @assert (abs(x0) ≤ h / 2) | (abs(x0) ≈ h / 2)
+    @assert size(cheb_approx, 1) == size(C, 1) - 1
+
+    for i in - w : w
+        x = - x0 + i * h
+        cheb_approx[i + w + 1] = chebcoef.f(x)
+    end
+
+    return cheb_approx
+end
+
+function f_eval(x0::T, chebcoef::ChebCoef{T}) where{T<:Union{Float32, Float64}}
+
+    cheb_approx = zeros(T, 2 * chebcoef.w + 1)
+    cheb_approx = f_eval!(x0, cheb_approx, chebcoef)
     
     return cheb_approx
 end

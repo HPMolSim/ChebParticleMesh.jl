@@ -21,13 +21,28 @@ function GridInfo(N_real::NTuple{3, Int}, w::NTuple{3, Int}, periodicity::NTuple
 
     trans_info = TransInfo(N_real, periodicity, image, pad)
 
-    return GridInfo{T}(N_real, w, periodicity, image, pad, L, h, N_image, N_pad, trans_info)
+    k = Vector{Array{T, 1}}()
+
+    for i in 1:3
+        ki = [2π * j / (L[i] + h[i] * 2 * pad[i]) for j in 0:(N_pad[i] - 1)]
+
+        for j in 1:N_pad[i]
+            if j - 1 > ceil(N_pad[i] / 2)
+                ki[j] -= 2π * N_pad[i] / (L[i] + h[i] * 2 * pad[i])
+            end
+        end
+
+        push!(k, ki)
+    end
+
+    return GridInfo{T}(N_real, w, periodicity, image, pad, L, h, N_image, N_pad, trans_info, k)
 end
 
 function GridBox(grid_info::GridInfo{T}) where{T<:Union{Float32, Float64}}
     pad_grid = zeros(T, grid_info.N_pad...)
     image_grid = zeros(T, grid_info.N_image...)
-    return GridBox{T}(pad_grid, image_grid)
+    cheb_value = [zeros(T, 2 * grid_info.w[i] + 1) for i in 1:3]
+    return GridBox{T}(pad_grid, image_grid, cheb_value)
 end
 
 """

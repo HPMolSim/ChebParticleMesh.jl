@@ -1,4 +1,5 @@
 struct ChebCoef{T}
+    f::Function
     h::T
     w::Int
     ν::Int
@@ -18,11 +19,15 @@ struct GridInfo{T}
     N_pad::NTuple{3, Int}
     
     trans_info::Vector{Tuple{NTuple{3, Int}, NTuple{3, Int}, NTuple{3, Int}}}
+    
+    k::Vector{Array{T, 1}}
 end
 
 mutable struct GridBox{T}
     pad_grid::Array{T, 3}
     image_grid::Array{T, 3}
+
+    cheb_value::Vector{Array{T, 1}}
 end
 
 abstract type AbstractIndex end

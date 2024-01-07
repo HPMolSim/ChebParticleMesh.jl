@@ -6,6 +6,6 @@
     c = ChebCoef(f, h, w, ν)
     for x0 in [- h / 2 : 0.01 : h / 2...]
         p = [i * h for i in -w:w]
-        @test pwcheb_eval(x0, c) ≈ f.(p .- x0)
+        @test pwcheb_eval(x0, c) ≈ f_eval(x0, c) ≈ f.(p .- x0)
     end
 end

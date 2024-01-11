@@ -1,53 +1,36 @@
-"""
+function nearest_grid_id(x::NTuple{N, T}, h::NTuple{N, T}) where{N, T}
 
-"""
-function nearest_grid_id(x::Point{3, T}, h::NTuple{3, T}) where{T}
+    id = Int.(round.((x .- h./2) ./ h)) .+ 1
 
-    idx = Int(round((x[1] - h[1] / 2) / h[1])) + 1
-    idy = Int(round((x[2] - h[2] / 2) / h[2])) + 1
-    idz = Int(round((x[3] - h[3] / 2) / h[3])) + 1
-
-    return idx, idy, idz
+    return id
 end
 
-function pad_grid_id(x::Point{3, T}, gridinfo::GridInfo{T}) where{T}
+function pad_grid_id(x::NTuple{N, T}, gridinfo::GridInfo{N, T}) where{N, T}
     
-    idx, idy, idz = nearest_grid_id(x, gridinfo.h)
+    id = nearest_grid_id(x, gridinfo.h)
 
-    idx = idx + gridinfo.pad[1]
-    idy = idy + gridinfo.pad[2]
-    idz = idz + gridinfo.pad[3]
-
-    return PadIndex(idx, idy, idz)
+    return PadIndex(id .+ gridinfo.pad)
 end
 
-function pad_grid_pos(id::PadIndex, gridinfo::GridInfo{T}) where{T}
+function pad_grid_pos(id::PadIndex{N}, gridinfo::GridInfo{N, T}) where{N, T}
 
-    x = (id.idx - gridinfo.pad[1] - T(0.5)) * gridinfo.h[1]
-    y = (id.idy - gridinfo.pad[2] - T(0.5)) * gridinfo.h[2]
-    z = (id.idz - gridinfo.pad[3] - T(0.5)) * gridinfo.h[3]
+    pos = (id.id .- gridinfo.pad .- T(0.5)) .* gridinfo.h
 
-    return Point(x, y, z)
+    return pos
 end
 
-function image_grid_id(x::Point{3, T}, gridinfo::GridInfo{T}) where{T}
+function image_grid_id(x::NTuple{N, T}, gridinfo::GridInfo{N, T}) where{N, T}
     
-    idx, idy, idz = nearest_grid_id(x, gridinfo.h)
+    id = nearest_grid_id(x, gridinfo.h)
 
-    idx = idx + gridinfo.image[1]
-    idy = idy + gridinfo.image[2]
-    idz = idz + gridinfo.image[3]
-
-    return ImageIndex(idx, idy, idz)
+    return ImageIndex(id .+ gridinfo.image)
 end
 
-function image_grid_pos(id::ImageIndex, gridinfo::GridInfo{T}) where{T}
+function image_grid_pos(id::ImageIndex{N}, gridinfo::GridInfo{N, T}) where{N, T}
 
-    x = (id.idx - gridinfo.image[1] - T(0.5)) * gridinfo.h[1]
-    y = (id.idy - gridinfo.image[2] - T(0.5)) * gridinfo.h[2]
-    z = (id.idz - gridinfo.image[3] - T(0.5)) * gridinfo.h[3]
+    pos = (id.id .- gridinfo.image .- T(0.5)) .* gridinfo.h
 
-    return Point(x, y, z)
+    return pos
 end
 
 function id_image2pad_single(id_image_i::Int, N_i::T, image_i::Int, pad_i::Int, periodicity::Bool) where{T}
@@ -72,15 +55,15 @@ function id_image2pad_single(id_image_i::Int, N_i::T, image_i::Int, pad_i::Int, 
     return id_pad_i
 end
 
-function id_image2pad(image::ImageIndex, gridinfo::GridInfo{T}) where{T}
+function id_image2pad(image::ImageIndex{N}, gridinfo::GridInfo{N, T}) where{N, T}
 
-    ix, iy, iz = image.idx, image.idy, image.idz
+    pad_id = tuple([id_image2pad_single(image.id[i], gridinfo.N_real[i], gridinfo.image[i], gridinfo.pad[i], gridinfo.periodicity[i]) for i in 1:N]...)
 
-    px = id_image2pad_single(ix, gridinfo.N_real[1], gridinfo.image[1], gridinfo.pad[1], gridinfo.periodicity[1])
-    py = id_image2pad_single(iy, gridinfo.N_real[2], gridinfo.image[2], gridinfo.pad[2], gridinfo.periodicity[2])
-    pz = id_image2pad_single(iz, gridinfo.N_real[3], gridinfo.image[3], gridinfo.pad[3], gridinfo.periodicity[3])
+    # px = id_image2pad_single(ix, gridinfo.N_real[1], gridinfo.image[1], gridinfo.pad[1], gridinfo.periodicity[1])
+    # py = id_image2pad_single(iy, gridinfo.N_real[2], gridinfo.image[2], gridinfo.pad[2], gridinfo.periodicity[2])
+    # pz = id_image2pad_single(iz, gridinfo.N_real[3], gridinfo.image[3], gridinfo.pad[3], gridinfo.periodicity[3])
 
-    return PadIndex(px, py, pz)
+    return PadIndex(pad_id)
 end
 
 function id_pad2image_single(id_pad_i::Int, N_i::T, image_i::Int, pad_i::Int, periodicity::Bool) where{T}
@@ -100,13 +83,15 @@ function id_pad2image_single(id_pad_i::Int, N_i::T, image_i::Int, pad_i::Int, pe
     end
 end
 
-function id_pad2image(pad::PadIndex, gridinfo::GridInfo{T}) where{T}
+function id_pad2image(pad::PadIndex{N}, gridinfo::GridInfo{N, T}) where{N, T}
 
-    px, py, pz = pad.idx, pad.idy, pad.idz
+    image_id = [id_pad2image_single(pad.id[i], gridinfo.N_real[i], gridinfo.image[i], gridinfo.pad[i], gridinfo.periodicity[i]) for i in 1:N]
 
-    ixs = id_pad2image_single(px, gridinfo.N_real[1], gridinfo.image[1], gridinfo.pad[1], gridinfo.periodicity[1])
-    iys = id_pad2image_single(py, gridinfo.N_real[2], gridinfo.image[2], gridinfo.pad[2], gridinfo.periodicity[2])
-    izs = id_pad2image_single(pz, gridinfo.N_real[3], gridinfo.image[3], gridinfo.pad[3], gridinfo.periodicity[3])
+    all_image_id = Vector{ImageIndex{N}}()
+    
+    for i in Iterators.product(image_id...)
+        push!(all_image_id, ImageIndex(i))
+    end
 
-    return [ImageIndex(ix, iy, iz) for ix in ixs, iy in iys, iz in izs]
+    return all_image_id
 end

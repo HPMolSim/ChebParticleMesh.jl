@@ -6,40 +6,36 @@ struct ChebCoef{T}
     coef::Array{T, 2}
 end
 
-struct GridInfo{T}
-    N_real::NTuple{3, Int}
-    w::NTuple{3, Int}
-    periodicity::NTuple{3, Bool}
-    image::NTuple{3, Int}
-    pad::NTuple{3, Int}
-    L::NTuple{3, T}
-    h::NTuple{3, T}
+struct GridInfo{N, T}
+    N_real::NTuple{N, Int}
+    w::NTuple{N, Int}
+    periodicity::NTuple{N, Bool}
+    image::NTuple{N, Int}
+    pad::NTuple{N, Int}
+    L::NTuple{N, T}
+    h::NTuple{N, T}
 
-    N_image::NTuple{3, Int}
-    N_pad::NTuple{3, Int}
+    N_image::NTuple{N, Int}
+    N_pad::NTuple{N, Int}
     
-    trans_info::Vector{Tuple{NTuple{3, Int}, NTuple{3, Int}, NTuple{3, Int}}}
+    trans_info::Vector{Tuple{NTuple{N, UnitRange{Int}}, NTuple{N, UnitRange{Int}}}}
     
     k::Vector{Array{T, 1}}
 end
 
-mutable struct GridBox{T}
-    pad_grid::Array{T, 3}
-    image_grid::Array{T, 3}
+mutable struct GridBox{N, T}
+    pad_grid::Array{T, N}
+    image_grid::Array{T, N}
 
     cheb_value::Vector{Array{T, 1}}
 end
 
 abstract type AbstractIndex end
 
-struct PadIndex <: AbstractIndex
-    idx::Int
-    idy::Int
-    idz::Int
+struct PadIndex{N} <: AbstractIndex
+    id::NTuple{N, Int}
 end
 
-struct ImageIndex <: AbstractIndex
-    idx::Int
-    idy::Int
-    idz::Int
+struct ImageIndex{N} <: AbstractIndex
+    id::NTuple{N, Int}
 end

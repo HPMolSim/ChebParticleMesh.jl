@@ -18,14 +18,12 @@ struct GridInfo{N, T}
     N_image::NTuple{N, Int}
     N_pad::NTuple{N, Int}
     
-    trans_info::Vector{Tuple{NTuple{N, UnitRange{Int}}, NTuple{N, UnitRange{Int}}}}
-    
     k::Vector{Array{T, 1}}
 end
 
 mutable struct GridBox{N, T}
     pad_grid::Array{T, N}
-    image_grid::Array{T, N}
+    image_grid::SubArray{T, N}
 
     cheb_value::Vector{Array{T, 1}}
 end

@@ -1,13 +1,13 @@
 module ChebParticleMesh
 
-using LinearAlgebra, ExTinyMD, FastTransforms, SpecialFunctions, LoopVectorization, FFTW
+using LinearAlgebra, FastTransforms, SpecialFunctions, LoopVectorization, FFTW
 
 export horner
 export ChebCoef, pwcheb_eval, pwcheb_eval!, f_eval, f_eval!
-export GridInfo, PadIndex, ImageIndex
-export id_image2pad, id_pad2image, grid_revise_image!, grid_revise_pad!, grid_image2pad!, grid_pad2image!
-export nearest_grid_id, pad_grid_id, image_grid_id, image_grid_pos, pad_grid_pos
-export interpolate_single!, interpolate!
+export GridInfo, GridBox, PadIndex, ImageIndex
+export id_image2pad, id_pad2image, grid_revise_pad!
+export nearest_grid_id, pad_grid_id, pad_grid_pos, image_grid_id, image_grid_pos
+export interpolate_single!, interpolate!, interpolate_single_direct!, interpolate_direct!
 
 include("types.jl")
 include("utils.jl")

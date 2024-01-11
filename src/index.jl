@@ -59,10 +59,6 @@ function id_image2pad(image::ImageIndex{N}, gridinfo::GridInfo{N, T}) where{N, T
 
     pad_id = tuple([id_image2pad_single(image.id[i], gridinfo.N_real[i], gridinfo.image[i], gridinfo.pad[i], gridinfo.periodicity[i]) for i in 1:N]...)
 
-    # px = id_image2pad_single(ix, gridinfo.N_real[1], gridinfo.image[1], gridinfo.pad[1], gridinfo.periodicity[1])
-    # py = id_image2pad_single(iy, gridinfo.N_real[2], gridinfo.image[2], gridinfo.pad[2], gridinfo.periodicity[2])
-    # pz = id_image2pad_single(iz, gridinfo.N_real[3], gridinfo.image[3], gridinfo.pad[3], gridinfo.periodicity[3])
-
     return PadIndex(pad_id)
 end
 
@@ -90,7 +86,16 @@ function id_pad2image(pad::PadIndex{N}, gridinfo::GridInfo{N, T}) where{N, T}
     all_image_id = Vector{ImageIndex{N}}()
     
     for i in Iterators.product(image_id...)
-        push!(all_image_id, ImageIndex(i))
+        flag = true
+        for j in 1:N
+            if (i[j] ≤ 0) | (i[j] ≥ gridinfo.N_image[j] + 1)
+                flag = false
+                break
+            end
+        end
+        if flag
+            push!(all_image_id, ImageIndex(i))
+        end
     end
 
     return all_image_id

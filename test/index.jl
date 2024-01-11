@@ -68,24 +68,24 @@ end
     extra_pad = (4, 5, 6)
     L = (100.0, 100.0, 100.0)
 
-    for periodicity_x in [true, false]
-        for periodicity_y in [true, false]
-            for periodicity_z in [true, false]
-                periodicity = (periodicity_x, periodicity_y, periodicity_z)
-                @testset "peridoicity is $(periodicity)" begin
-                    gridinfo = GridInfo(N_real, w, periodicity, extra_pad, L)
-                    for transinfo_i in gridinfo.trans_info
-                        image_region, pad_region = transinfo_i
-                        for (ix, px) in zip(image_region[1], pad_region[1])
-                            for (iy, py) in zip(image_region[2], pad_region[2])
-                                for (iz, pz) in zip(image_region[3], pad_region[3])
-                                    @test id_image2pad(ImageIndex((ix, iy, iz)), gridinfo) == PadIndex((px, py, pz))
-                                    @test ImageIndex((ix, iy, iz)) ∈ id_pad2image(PadIndex((px, py, pz)), gridinfo)
-                                end
-                            end
-                        end
-                    end
+    for periodicity_x in [true, false], periodicity_y in [true, false], periodicity_z in [true, false]
+        periodicity = (periodicity_x, periodicity_y, periodicity_z)
+        @testset "peridoicity is $(periodicity)" begin
+            gridinfo = GridInfo(N_real, w, periodicity, extra_pad, L)
+            gb = GridBox(gridinfo)
+
+            gb.image_grid .+= rand(gridinfo.N_image...)
+
+            for i in 1:gridinfo.N_pad[1], j in 1:gridinfo.N_pad[2], k in 1:gridinfo.N_pad[3]
+                id_image = id_pad2image(PadIndex((i, j, k)), gridinfo)
+                for id_image_i in id_image
+                    @test gb.pad_grid[i, j, k] == gb.image_grid[id_image_i.id...]
                 end
+            end
+
+            for i in 1:gridinfo.N_image[1], j in 1:gridinfo.N_image[2], k in 1:gridinfo.N_image[3]
+                id_pad = id_image2pad(ImageIndex((i, j, k)), gridinfo)
+                @test gb.image_grid[i, j, k] == gb.pad_grid[id_pad.id...]
             end
         end
     end

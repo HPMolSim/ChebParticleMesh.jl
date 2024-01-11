@@ -1,6 +1,5 @@
 using ChebParticleMesh
 using Test
-using ExTinyMD
 
 @testset "ChebParticleMesh.jl" begin
     include("utils.jl")

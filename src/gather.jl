@@ -3,6 +3,8 @@ function gather_single(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbo
     potential_i = zero(T)
 
     cheb_value = gridbox.cheb_value
+    idl = gridinfo.index_list
+
     near_id_image = image_grid_id(pos, gridinfo)
     near_pos_image = image_grid_pos(near_id_image, gridinfo)
     for i in 1:N
@@ -10,8 +12,9 @@ function gather_single(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbo
         pwcheb_eval!(dx, cheb_value[i], chebcoefs[i])
     end
 
-    for id in Iterators.product([- gridinfo.w[i] : gridinfo.w[i] for i in 1:N]...)
-        potential_i += real(gridbox.image_grid[(near_id_image.id .+ id)...]) * prod(cheb_value[i][id[i] + gridinfo.w[i] + 1] for i in 1:N)
+    for i in gridinfo.iter_list
+        image_id = near_id_image.id .+ i
+        potential_i += real(get_pad(gridbox.pad_grid, idl, image_id)) * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N)
     end
 
     return q * 4π * prod(gridinfo.h) * potential_i
@@ -34,6 +37,8 @@ function gather_single_direct(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T},
     potential_i = zero(T)
 
     cheb_value = gridbox.cheb_value
+    idl = gridinfo.index_list
+
     near_id_image = image_grid_id(pos, gridinfo)
     near_pos_image = image_grid_pos(near_id_image, gridinfo)
     for i in 1:N
@@ -41,8 +46,9 @@ function gather_single_direct(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T},
         f_eval!(dx, cheb_value[i], chebcoefs[i])
     end
 
-    for id in Iterators.product([- gridinfo.w[i] : gridinfo.w[i] for i in 1:N]...)
-        potential_i += real(gridbox.image_grid[(near_id_image.id .+ id)...]) * prod(cheb_value[i][id[i] + gridinfo.w[i] + 1] for i in 1:N)
+    for i in gridinfo.iter_list
+        image_id = near_id_image.id .+ i
+        potential_i += real(get_pad(gridbox.pad_grid, idl, image_id)) * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N)
     end
 
     return q * 4π * prod(gridinfo.h) * potential_i

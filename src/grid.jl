@@ -33,13 +33,16 @@ function GridInfo(N_real::NTuple{N, Int}, w::NTuple{N, Int}, periodicity::NTuple
         push!(k, ki)
     end
 
-    return GridInfo{N, T}(N_real, w, periodicity, image, pad, L, h, N_image, N_pad, k)
+    index_list = [mod1.(1 + pad[i] - image[i]:pad[i] + N_real[i] + image[i], N_pad[i]) for i in 1:N]
+    iter_list = Iterators.product([- w[i] : w[i] for i in 1:N]...)
+
+    return GridInfo{N, T}(N_real, w, periodicity, image, pad, L, h, N_image, N_pad, index_list, iter_list, k)
 end
 
 function GridBox(grid_info::GridInfo{N, T}) where{N, T<:Union{Float32, Float64}}
     pad_grid = zeros(Complex{T}, grid_info.N_pad...)
     
-    image_grid = view(pad_grid, [mod1.(1 + grid_info.pad[i] - grid_info.image[i]:grid_info.pad[i] + grid_info.N_real[i] + grid_info.image[i], grid_info.N_pad[i]) for i in 1:N]...)
+    image_grid = view(pad_grid, grid_info.index_list...)
 
     cheb_value = [zeros(T, 2 * grid_info.w[i] + 1) for i in 1:N]
     return GridBox{N, T}(pad_grid, image_grid, cheb_value)

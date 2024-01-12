@@ -17,7 +17,9 @@ struct GridInfo{N, T}
 
     N_image::NTuple{N, Int}
     N_pad::NTuple{N, Int}
-    
+    index_list::Vector{Vector{Int}}
+    iter_list::Iterators.ProductIterator{NTuple{N, UnitRange{Int64}}}
+
     k::Vector{Array{T, 1}}
 end
 

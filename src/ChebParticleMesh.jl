@@ -2,7 +2,8 @@ module ChebParticleMesh
 
 using LinearAlgebra, FastTransforms, SpecialFunctions, LoopVectorization, FFTW
 
-export horner
+export horner, funcpack
+export Wkb, FWkb
 export ChebCoef, pwcheb_eval, pwcheb_eval!, f_eval, f_eval!
 export GridInfo, GridBox, PadIndex, ImageIndex
 export id_image2pad, id_pad2image, grid_revise_pad!

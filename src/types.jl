@@ -22,8 +22,8 @@ struct GridInfo{N, T}
 end
 
 mutable struct GridBox{N, T}
-    pad_grid::Array{T, N}
-    image_grid::SubArray{T, N}
+    pad_grid::Array{Complex{T}, N}
+    image_grid::SubArray{Complex{T}, N}
 
     cheb_value::Vector{Array{T, 1}}
 end
@@ -36,4 +36,9 @@ end
 
 struct ImageIndex{N} <: AbstractIndex
     id::NTuple{N, Int}
+end
+
+struct ScalingFactor{N, T}
+    f::Function
+    factors::Array{Complex{T}, N}
 end

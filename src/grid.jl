@@ -37,7 +37,7 @@ function GridInfo(N_real::NTuple{N, Int}, w::NTuple{N, Int}, periodicity::NTuple
 end
 
 function GridBox(grid_info::GridInfo{N, T}) where{N, T<:Union{Float32, Float64}}
-    pad_grid = zeros(T, grid_info.N_pad...)
+    pad_grid = zeros(Complex{T}, grid_info.N_pad...)
     
     image_grid = view(pad_grid, [mod1.(1 + grid_info.pad[i] - grid_info.image[i]:grid_info.pad[i] + grid_info.N_real[i] + grid_info.image[i], grid_info.N_pad[i]) for i in 1:N]...)
 
@@ -54,7 +54,7 @@ function grid_revise_pad!(gridbox::GridBox{N, T}) where{N, T}
 function grid_revise_pad!(gridbox::GridBox{N, T}) where{N, T}
 
     for i in eachindex(gridbox.pad_grid)
-        gridbox.pad_grid[i] = zero(T)
+        gridbox.pad_grid[i] = zero(Complex{T})
     end
 
     return nothing

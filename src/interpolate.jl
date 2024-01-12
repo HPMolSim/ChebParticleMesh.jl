@@ -18,7 +18,7 @@ end
 function interpolate!(qs::Vector{T}, poses::Vector{NTuple{N, T}}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
 
     @assert length(qs) == length(poses)
-    grid_revise_image!(gridbox)
+    grid_revise_pad!(gridbox)
 
     for i in 1:length(qs)
         interpolate_single!(qs[i], poses[i], gridinfo, gridbox, chebcoefs)
@@ -47,7 +47,7 @@ end
 function interpolate_direct!(qs::Vector{T}, poses::Vector{NTuple{N, T}}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
 
     @assert length(qs) == length(poses)
-    grid_revise_image!(gridbox)
+    grid_revise_pad!(gridbox)
 
     for i in 1:length(qs)
         interpolate_single_direct!(qs[i], poses[i], gridinfo, gridbox, chebcoefs)

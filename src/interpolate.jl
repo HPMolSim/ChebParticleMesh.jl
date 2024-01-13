@@ -12,8 +12,7 @@ function interpolate_single!(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, 
 
     for i in gridinfo.iter_list
         image_id = near_id_image.id .+ i
-        value = Complex{T}(q * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N))
-        revise_pad!(gridbox.pad_grid, idl, image_id, value)
+        gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...] += Complex{T}(q * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N))
     end
 
     return nothing
@@ -45,8 +44,7 @@ function interpolate_single_direct!(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{
 
     for i in gridinfo.iter_list
         image_id = near_id_image.id .+ i
-        value = Complex{T}(q * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N))
-        revise_pad!(gridbox.pad_grid, idl, image_id, value)
+        gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...] += Complex{T}(q * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N))
     end
 
     return nothing

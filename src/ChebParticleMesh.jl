@@ -9,6 +9,9 @@ export GridInfo, GridBox, PadIndex, ImageIndex
 export id_image2pad, id_pad2image, grid_revise_pad!
 export nearest_grid_id, pad_grid_id, pad_grid_pos, image_grid_id, image_grid_pos
 export interpolate_single!, interpolate!, interpolate_single_direct!, interpolate_direct!
+export ScalingFactor, scale!
+export fft!, ifft!
+export gather_single, gather, gather_single_direct, gather_direct
 
 include("types.jl")
 include("utils.jl")

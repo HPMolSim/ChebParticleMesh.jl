@@ -12,7 +12,7 @@ function interpolate_single!(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, 
 
     for i in gridinfo.iter_list
         image_id = near_id_image.id .+ i
-        gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...] += Complex{T}(q * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N))
+        gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...] += Complex{T}(q * prod(cheb_value[j][i[j] + gridinfo.w[j] + 1] for j in 1:N))
     end
 
     return nothing
@@ -44,7 +44,7 @@ function interpolate_single_direct!(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{
 
     for i in gridinfo.iter_list
         image_id = near_id_image.id .+ i
-        gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...] += Complex{T}(q * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N))
+        gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...] += Complex{T}(q * prod(cheb_value[j][i[j] + gridinfo.w[j] + 1] for j in 1:N))
     end
 
     return nothing
@@ -60,4 +60,20 @@ function interpolate_direct!(qs::Vector{T}, poses::Vector{NTuple{N, T}}, gridinf
     end
 
     return nothing
+end
+
+function interpolate_single_naive!(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
+
+    near_id_image = image_grid_id(pos, gridinfo)
+    idl = gridinfo.index_list
+
+    for d_id in Iterators.product([(-gridinfo.image[d]):(gridinfo.image[d]) for d in 1:N]...)
+        image_id = near_id_image.id .+ d_id
+        pos_image = image_grid_pos(ImageIndex(image_id), gridinfo)
+        d_pos = pos .- pos_image
+        gridbox.image_grid[image_id...] += q * prod(chebcoefs[d].f(d_pos[d]) for d in 1:N)
+    end
+
+    return nothing
+
 end

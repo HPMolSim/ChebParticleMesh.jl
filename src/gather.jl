@@ -14,7 +14,7 @@ function gather_single(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbo
 
     for i in gridinfo.iter_list
         image_id = near_id_image.id .+ i
-        potential_i += real(gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...]) * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N)
+        potential_i += real(gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...]) * prod(cheb_value[j][i[j] + gridinfo.w[j] + 1] for j in 1:N)
     end
 
     return q * 4π * prod(gridinfo.h) * potential_i
@@ -48,7 +48,7 @@ function gather_single_direct(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T},
 
     for i in gridinfo.iter_list
         image_id = near_id_image.id .+ i
-        potential_i += real(gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...]) * prod(cheb_value[1][i[j] + gridinfo.w[1] + 1] for j in 1:N)
+        potential_i += real(gridbox.pad_grid[ntuple(j -> idl[j][image_id[j]], N)...]) * prod(cheb_value[j][i[j] + gridinfo.w[j] + 1] for j in 1:N)
     end
 
     return q * 4π * prod(gridinfo.h) * potential_i

@@ -1,5 +1,5 @@
-using ChebParticleMesh
 using EwaldSummations, ExTinyMD, Plots
+using ChebParticleMesh
 
 n_atoms = 200
 qs = 2.0 .* rand(n_atoms) .- 1.0

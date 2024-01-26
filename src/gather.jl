@@ -1,4 +1,4 @@
-function gather_single(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
+@inbounds function gather_single(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
     
     potential_i = zero(T)
 
@@ -20,7 +20,7 @@ function gather_single(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbo
     return q * 4π * prod(gridinfo.h) * potential_i
 end
 
-function gather(qs::Vector{T}, poses::Vector{NTuple{N, T}}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
+@inbounds function gather(qs::Vector{T}, poses::Vector{NTuple{N, T}}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
 
     @assert length(qs) == length(poses)
 
@@ -32,7 +32,7 @@ function gather(qs::Vector{T}, poses::Vector{NTuple{N, T}}, gridinfo::GridInfo{N
     return potential
 end
 
-function gather_single_direct(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
+@inbounds function gather_single_direct(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
     
     potential_i = zero(T)
 
@@ -54,7 +54,7 @@ function gather_single_direct(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T},
     return q * 4π * prod(gridinfo.h) * potential_i
 end
 
-function gather_direct(qs::Vector{T}, poses::Vector{NTuple{N, T}}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
+@inbounds function gather_direct(qs::Vector{T}, poses::Vector{NTuple{N, T}}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
 
     @assert length(qs) == length(poses)
 
@@ -64,4 +64,20 @@ function gather_direct(qs::Vector{T}, poses::Vector{NTuple{N, T}}, gridinfo::Gri
     end
 
     return potential
+end
+
+function gather_single_naive(q::T, pos::NTuple{N, T}, gridinfo::GridInfo{N, T}, gridbox::GridBox{N, T}, chebcoefs::NTuple{N, ChebCoef{T}}) where{N, T}
+    
+    potential_i = zero(T)
+
+    near_id_image = image_grid_id(pos, gridinfo)
+
+    for d_id in Iterators.product([(-gridinfo.image[d]):(gridinfo.image[d]) for d in 1:N]...)
+        image_id = near_id_image.id .+ d_id
+        pos_image = image_grid_pos(ImageIndex(image_id), gridinfo)
+        d_pos = pos .- pos_image
+        potential_i += real(gridbox.image_grid[image_id...]) * prod(chebcoefs[d].f(d_pos[d]) for d in 1:N)
+    end
+
+    return q * 4π * prod(gridinfo.h) * potential_i
 end

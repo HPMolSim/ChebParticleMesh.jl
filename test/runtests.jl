@@ -6,4 +6,5 @@ using Test
     include("chebpoly.jl")
     include("index.jl")
     include("interpolate.jl")
+    include("gather.jl")
 end

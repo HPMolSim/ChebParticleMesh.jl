@@ -11,7 +11,7 @@ export nearest_grid_id, pad_grid_id, pad_grid_pos, image_grid_id, image_grid_pos
 export interpolate_single!, interpolate!, interpolate_single_direct!, interpolate_direct!, interpolate_single_naive!
 export ScalingFactor, scale!
 export fft!, ifft!
-export gather_single, gather, gather_single_direct, gather_direct
+export gather_single, gather, gather_single_direct, gather_direct, gather_single_naive
 
 include("types.jl")
 include("utils.jl")

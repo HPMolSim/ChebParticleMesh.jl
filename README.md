@@ -37,10 +37,8 @@ Specially, this package is called **Cheb**ParticleMesh.jl because we provided to
 
 In the following example, we will show how to use the `ChebParticleMesh.jl` to implentation of the long-range part of the well known [P3M method](https://en.wikipedia.org/wiki/P3M).
 
-The target is to compute the double summation
-$$
-\sum_{\mathbf{m} \in \mathbb{Z}^3}\sum_{i = 1}^N \sum_{j = 1}^N q_i q_j \frac{\mathrm{erf}(\alpha |\mathbf{r}_{ij} + \mathbf{L_m}|)}{|\mathbf{r}_{ij}|}
-$$
+The target is to compute the double summation:
+$\sum_{\mathbf{m} \in \mathbb{Z}^3} \sum_{i, j} q_i q_j \frac{\mathrm{erf}( \alpha (r_{ij} + L_m))}{r_{ij} + L_m}$.
 where $\mathrm{erf}(\cdot)$ for the error function and $\mathbf{L_m} = (m_x L_x, m_y L_y, m_z L_z)$ for the periodic images.
 
 First we set up the system:

@@ -23,19 +23,21 @@ to install the package.
 In this package, the process of Particle-Mesh is divided into SIX different steps, including
 
 1. Pre-computating: Generating the grid, the window function and scaling factors
-2. Interpolatation: Interpolating the point sources onto the grids
+2. Interpolation: Interpolating the point sources onto the grids
 3. FFT: Using FFT to transform the density on grids into the reciprocal space
 4. Scaling: Scale the fourier modes with the Green's function
 5. IFFT: Using IFFT to transform the grid back to the real space
 6. Gathering: Integrate the potential on the grid back to the particles
 
 Specially, this package is called **Cheb**ParticleMesh.jl because we provided tools to approximate the window functions via piecewise Chebyshev poly, so that the calculation can be much faster when using some complicated kernels, such as the KB-kernel.
+In this package, only pre-computation leads to huge allocation but only needed to be calculated once before the calculation. 
+FFT and IFFT needs 4 allocations by FFTW; interpolating, scaling and gathering are allocation free, so that the package is highly efficient.
 
 ## Examples of Use
 
 ### Implentation of PPPM
 
-In the following example, we will show how to use the `ChebParticleMesh.jl` to implentation of the long-range part of the well known [P3M method](https://en.wikipedia.org/wiki/P3M).
+In the following example, we will show how to use the `ChebParticleMesh.jl` to implentate the long-range part of the well known [P3M method](https://en.wikipedia.org/wiki/P3M).
 
 The target is to compute the double summation:
 $\sum_{\mathbf{m} \in \mathbb{Z}^3} \sum_{i, j} q_i q_j \frac{\mathrm{erf}( \alpha (r_{ij} + L_m))}{r_{ij} + L_m}$.
